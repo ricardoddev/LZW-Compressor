@@ -5,7 +5,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         LZW lzw = new LZW();
 
-        System.out.println("Digite 1 para compactar ou 2 para descompactar:");
+        System.out.println("Digite 1 para compressão ou 2 para descompressão:");
         int operation = scanner.nextInt();
 
         System.out.println("Digite o caminho do arquivo:");
@@ -13,8 +13,10 @@ public class Main {
 
         if (operation == 1) {
             lzw.compress(path);
+            System.out.println("Compressão concluída. Cheque a pasta para verificar o arquivo comprimido.");
         } else if (operation == 2) {
             lzw.decompress(path);
+            System.out.println("Descompressão concluída. Cheque a pasta para verificar o arquivo descomprimido.");
         } else {
             System.out.println("Operação inválida.");
         }
