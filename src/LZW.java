@@ -25,7 +25,9 @@ public class LZW {
                 if (code <= MAX) { //se ainda possuir espaço no dicionário
                     dict.put(current, code++); //adiciona a sequencia atual e incrementa o código
                 }
-                current = current.substring(0, current.length() - 1); //após adicionar a sequência ao dicionário, remove o último caractere da sequência atual porque esse caractere vai ser o início da próxima sequência, apenas se a sequência atual não existir no dicionário
+                if (!current.isEmpty()) {
+                    current = current.substring(0, current.length() - 1); //após adicionar a sequência ao dicionário, remove o último caractere da sequência atual porque esse caractere vai ser o início da próxima sequência, apenas se a sequência atual não existir no dicionário
+                }
                 writer.write(dict.get(current), WIDTH); //escreve a sequência atual no arquivo comprimido
                 current = Character.toString(c); //inicia uma nova sequência a partir do último caractere que foi lido e removido anteriormente
             }
