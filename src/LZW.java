@@ -1,5 +1,4 @@
-import java.util.HashMap;
-import java.util.Map;
+import java.util.NoSuchElementException;
 
 public class LZW {
     private static final int WIDTH = 12; //tamanho de 12 bits, permite que armazene até 4096 sequencias de caracteres diferentes
@@ -12,7 +11,7 @@ public class LZW {
 
         HashmapLZW<String, Integer> dict = new HashmapLZW<>(); //dicionário com todos os caracteres ASCII, sendo o caractere com um código inteiro de 0 a 255
         for (int i = 0; i < 256; i++) {
-            dict.put(Character.toString((char) i), i); //criando pares chave-valor com o dicionário - atribuindo cada número a um caractere
+            dict.put(Character.toString((char) i), i); //criando pares chave-valor do dicionário baseado na tabela ASCII
         }
 
         String current = ""; //valor atual que será lido (poderá se tornar um par)
@@ -37,23 +36,27 @@ public class LZW {
     }
 
     public void decompress(String compressedFilePath) {
-        String decompressedFilePath = compressedFilePath.substring(0, compressedFilePath.lastIndexOf(".")) + "_decompressed.txt"; //caminho do arquivo que será gerado -> nomeDoArquivo_descompressed.lzw
-        BinaryIn reader = new BinaryIn(compressedFilePath); //ler arquivo original -> BIBLIOTECA DE PRINCETON
-        BinaryOut writer = new BinaryOut(decompressedFilePath); //escrever novo arquivo -> BIBLIOTECA DE PRINCETON
+        String decompressedFilePath = compressedFilePath.substring(0, compressedFilePath.lastIndexOf(".")) + "_decompressed.txt"; //caminho do arquivo e acrescenta _descompressed.txt
+        BinaryIn reader = new BinaryIn(compressedFilePath); //importação do leitor do arquivo
+        BinaryOut writer = new BinaryOut(decompressedFilePath); //importação do que vai escrever o novo arquivo
 
-        HashmapLZW<Integer, String> dict = new HashmapLZW<>(); //dicionário com todos os caracteres ASCII, só que INVERTIDO (int, string)
+        HashmapLZW<Integer, String> dict = new HashmapLZW<>(); //criação do dicionario
         for (int i = 0; i < 256; i++) {
-            dict.put(i, Character.toString((char) i)); //criando pares chave-valor com o dicionário - atribuindo cada número a um caractere
+            dict.put(i, Character.toString((char) i)); //isso aqui adiciona todos os caracteres ASCII possíveis, se tiverem todos
         }
 
-        int current = reader.readInt(WIDTH); //leitura do arquivo por meio da classe reader, da biblioteca de princeton. Isso funciona pois o arquivo inteiro é representado por números inteiros, e ele faz a leitura desses números que representam uma sequência de caracteres
-        String value = dict.get(current); //após a leitura do arquivo, aqui são retornadas as sequências de caracteres relacionadas ao inteiro que foi lido anteriormente
-        writer.write(value); //aqui a string é escrita no arquivo que esta sendo descomprimido
-        int previous = current; //inicia a variável previous como todos os dados do arquivo
-        int code = 256;
+        int previous = reader.readInt(WIDTH); //percorre o arquivo para realizar a leitura das CHAVES e armazena nessa variavel
+        String value = dict.get(previous); //aqui ele pega o valor das chaves e armazena em value
+        writer.write(value); //escreve value no novo arquivo
+        int code = 256; //a próxima chave tem que ser 256 já que já temos até a 255
 
-        while (!reader.isEmpty()) { //enquanto não ler todos os inteiros
-            current = reader.readInt(WIDTH); //current é definido como o próximo valor
+        while (true) { //esse while(true) está aqui para realizar uma prevenção de erros
+            int current;
+            try {
+                current = reader.readInt(WIDTH); //se ainda tiver dados para ler, ele realiza a leitura aqui
+            } catch (NoSuchElementException e) {
+                break; //se ele encontrar um erro, ele para a execução do loop
+            }
 
             if (dict.containsKey(current)) { //se tiver no dicionario
                 value = dict.get(current); //já temos essa sequência salva, então só retornamos ela
