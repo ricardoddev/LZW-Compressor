@@ -22,7 +22,7 @@ public class LZW {
             current += c; //é adicionado a string current
 
             if (!dict.containsKey(current)) { //se não possui a sequencia atual
-                if (code <= MAX) { //se ainda possuir espaço no dicionário
+                if (code <= MAX) { //se ainda possuir memória no dicionárior
                     dict.put(current, code++); //adiciona a sequencia atual e incrementa o código
                 }
                 if (!current.isEmpty()) {
